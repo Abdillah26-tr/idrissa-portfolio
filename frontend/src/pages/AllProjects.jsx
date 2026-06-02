@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react"
 import { getProjects } from "../api/api"
 import "./AllProjects.css"
+
 function Projects() {
 
     const [projects, setProjects] = useState([])
@@ -42,6 +43,12 @@ function Projects() {
 
         setFlipped(flipped === id ? null : id)
 
+    }
+
+    // FIX URL FUNCTION
+    const fixUrl = (url) => {
+        if (!url) return null
+        return url.startsWith("http") ? url : `https://${url}`
     }
 
     return (
@@ -113,22 +120,32 @@ function Projects() {
 
                                 </div>
 
-                                {/* LINKS */}
+                                {/* LINKS (FIXED) */}
                                 <div className="links">
 
-                                    <a
-                                        href={project.live_link}
-                                        onClick={(e) => e.stopPropagation()}
-                                    >
-                                        Live
-                                    </a>
+                                    {/* LIVE */}
+                                    {fixUrl(project.live_link) && (
+                                        <a
+                                            href={fixUrl(project.live_link)}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            Live
+                                        </a>
+                                    )}
 
-                                    <a
-                                        href={project.github_link}
-                                        onClick={(e) => e.stopPropagation()}
-                                    >
-                                        Code
-                                    </a>
+                                    {/* GITHUB */}
+                                    {fixUrl(project.github_link) && (
+                                        <a
+                                            href={fixUrl(project.github_link)}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            onClick={(e) => e.stopPropagation()}
+                                        >
+                                            Code
+                                        </a>
+                                    )}
 
                                 </div>
 

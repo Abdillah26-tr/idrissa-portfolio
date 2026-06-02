@@ -44,6 +44,10 @@ INSTALLED_APPS = [
     'corsheaders',
 
 ]
+INSTALLED_APPS += [
+    "cloudinary",
+    "cloudinary_storage",
+]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -125,8 +129,6 @@ USE_TZ = True
 STATIC_URL = 'static/'
 CORS_ALLOW_ALL_ORIGINS = True
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
 
 
 JAZZMIN_SETTINGS = {
@@ -224,3 +226,15 @@ JAZZMIN_UI_TWEAKS = {
     
 
 }
+
+
+
+import cloudinary
+
+CLOUDINARY_STORAGE = {
+    "CLOUD_NAME": "dyxnjsbjc",
+    "API_KEY": "833468996564241",
+    "API_SECRET": "Jxo9Kg1DiFJt9Q-VMdvVSIvyTpU",
+}
+
+DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"

@@ -1,0 +1,122 @@
+/* ================= STATS BAR ================= */
+
+body{
+
+    background: #0f172a; 
+}
+.stats {
+    
+    width: 80%;              /* 🔥 REDUCED FROM 85% TO HALF */
+    margin: 0 auto;
+
+    position: relative;
+    top: -40px;
+
+    background: #ffffff;
+    padding: 5px 2px;
+
+    border-radius: 100px;
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    box-shadow: 0 12px 30px rgba(58, 39, 100, 0.1);
+
+    z-index: 10;
+
+    transition: all 0.3s ease;
+}
+/* ================= ITEM ================= */
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+
+    flex: 1;
+}
+
+/* ================= ICON ================= */
+
+.icon-box {
+    width: 45px;
+    height: 45px;
+
+    background: #eef4ff;
+    border-radius: 50%;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    color: #2563eb;
+    font-size: 18px;
+
+    transition: 0.3s;
+}
+
+.stat-item:hover .icon-box {
+    transform: scale(1.1);
+    background: #dbeafe;
+}
+
+/* ================= TEXT ================= */
+
+.info h3 {
+    font-size: 18px;
+    color: #111;
+    margin-bottom: 2px;
+    font-weight: bold;
+}
+
+.info p {
+    font-size: 12px;
+    color: #666;
+}
+
+/* ================= DIVIDER ================= */
+
+.line {
+    width: 1px;
+    height: 35px;
+    background: #e5e7eb;
+}
+
+/* ================= MOBILE ================= */
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width: 768px) {
+
+    .stats {
+        width: 95%;          /* 🔥 almost full width */
+        padding: 12px 10px;
+
+        border-radius: 25px;
+    }
+
+    .stat-item {
+        gap: 6px;
+    }
+
+    .icon-box {
+        width: 32px;
+        height: 32px;
+        font-size: 13px;
+    }
+
+    .info h3 {
+        font-size: 13px;
+    }
+
+    .info p {
+        font-size: 9px;
+        white-space: nowrap;
+    }
+
+    .line {
+        height: 20px;
+    }
+}

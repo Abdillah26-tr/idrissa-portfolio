@@ -1,159 +1,176 @@
-import { useEffect, useRef, useState } from "react"
-import { getProjects } from "../api/api"
-import { Link } from "react-router-dom"
+import { useEffect, useState } from "react";
+import { getProjects } from "../api/api";
 
 function Projects() {
+  const [projects, setProjects] = useState([]);
+  const [filtered, setFiltered] = useState([]);
+  const [active, setActive] = useState("all");
+  const [flipped, setFlipped] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-    const [projects, setProjects] = useState([])
-    const scrollRef = useRef(null)
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const data = await getProjects();
+        setProjects(data);
+        setFiltered([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, []);
 
-    // LOAD PROJECTS
-    useEffect(() => {
+  /* =========================
+     FIXED CATEGORIES
+  ========================= */
+  const categories = [
+    "all",
+    "data analysis",
+    "predictive modeling",
+   
+    "deep learning",
+    "computer vision",
+    "clustering",
+    "web development",
+    "others",
+  ];
 
-        async function load() {
+  const filter = (cat) => {
+    setActive(cat);
 
-            const data = await getProjects()
-            setProjects(data)
+    if (cat === "all") {
+      setFiltered([]); // NO CARDS
+    } else {
+      setFiltered(
+        projects.filter((p) => p.category === cat)
+      );
+    }
+  };
 
-        }
+  if (loading)
+    return <p style={{ color: "#fff" }}>Loading...</p>;
 
-        load()
+  return (
+    <section className="projects-section" id="projects">
+      <h2 className="section-title">Projects</h2>
 
-    }, [])
-
-    // AUTO SLIDE
-    useEffect(() => {
-
-        const container = scrollRef.current
-
-        if (!container || projects.length === 0) return
-
-        const interval = setInterval(() => {
-
-            const card = container.querySelector(".project-card")
-
-            if (!card) return
-
-            const cardWidth = card.offsetWidth + 20
-
-            const maxScroll =
-                container.scrollWidth - container.clientWidth
-
-            // IF END → RETURN TO START
-            if (container.scrollLeft >= maxScroll - 5) {
-
-                container.scrollTo({
-                    left: 0,
-                    behavior: "smooth"
-                })
-
-            } else {
-
-                container.scrollBy({
-                    left: cardWidth,
-                    behavior: "smooth"
-                })
-
+      {/* FILTERS */}
+      <div className="project-filters">
+        {categories.map((c) => (
+          <button
+            key={c}
+            className={
+              active === c ? "filter-btn active" : "filter-btn"
             }
+            onClick={() => filter(c)}
+          >
+            {c}
+          </button>
+        ))}
+      </div>
 
-        }, 6000)
+      {/* MESSAGE OR GRID */}
+      {active === "all" ? (
+        <p className="category-message">
+          Please choose a category
+        </p>
+      ) : (
+        <div className="projects-grid">
+          {filtered.map((project) => (
+            <div
+              key={project.id}
+              className={`project-card ${
+                flipped === project.id ? "flipped" : ""
+              }`}
+              onClick={() =>
+                setFlipped(
+                  flipped === project.id
+                    ? null
+                    : project.id
+                )
+              }
+            >
+              <div className="project-inner">
 
-        return () => clearInterval(interval)
+                {/* FRONT */}
+                <div className="project-front">
+                  <img
+                    src={project.image}
+                    className="project-image"
+                  />
 
-    }, [projects])
+                  <div className="project-content">
+                    <h3>{project.title}</h3>
 
-    return (
-
-        <section className="projects" id="projects">
-
-            {/* HEADER */}
-            <div className="projects-head">
-
-                <span>MY WORK</span>
-
-                <h2>Featured Projects</h2>
-
-            </div>
-
-            {/* SCROLL CONTAINER */}
-            <div className="projects-scroll" ref={scrollRef}>
-
-                {projects.map((project) => (
-
-                    <div className="project-card" key={project.id}>
-
-                        {/* IMAGE */}
-                        <div className="project-img">
-
-                            <img
-                                src={project.image}
-                                alt={project.title}
-                            />
-
-                        </div>
-
-                        {/* CONTENT */}
-                        <div className="project-content">
-
-                            <h3>{project.title}</h3>
-
-                            <p>{project.description}</p>
-
-                            {/* TECH */}
-                            <div className="project-tech">
-
-                                {project.tech?.map((tech, index) => (
-                                    <span key={index}>
-                                        {tech}
-                                    </span>
-                                ))}
-
-                            </div>
-
-                            {/* BUTTONS */}
-                            <div className="project-buttons">
-
-                                <a
-                                    href={project.live}
-                                    target="_blank"
-                                    className="btn-live"
-                                >
-                                    Live
-                                </a>
-
-                                <a
-                                    href={project.github}
-                                    target="_blank"
-                                    className="btn-git"
-                                >
-                                    GitHub
-                                </a>
-
-                            </div>
-
-                        </div>
-
+                    <div className="tools">
+                      {project.tools
+                        .split(",")
+                        .map((tool, i) => (
+                          <span
+                            key={i}
+                            className="tool-tag"
+                          >
+                            {tool.trim()}
+                          </span>
+                        ))}
                     </div>
 
-                ))}
+                    <div className="links">
+                      {project.github_link && (
+                        <a
+                          href={project.github_link}
+                          target="_blank"
+                          rel="noreferrer"
+                          onClick={(e) =>
+                            e.stopPropagation()
+                          }
+                        >
+                          GitHub
+                        </a>
+                      )}
 
+                      {project.live_link && (
+                        <a
+                          href={project.live_link}
+                          target="_blank"
+                          rel="noreferrer"
+                          onClick={(e) =>
+                            e.stopPropagation()
+                          }
+                        >
+                          Live
+                        </a>
+                      )}
+                    </div>
+
+                    <small className="date">
+                      {new Date(
+                        project.created_at
+                      ).toLocaleDateString()}
+                    </small>
+
+                    <div className="hover-text">
+                      Click me for description
+                    </div>
+                  </div>
+                </div>
+
+                {/* BACK */}
+                <div className="project-back">
+                  <h3>{project.title}</h3>
+                  <p className="desc">
+                    {project.description}
+                  </p>
+                </div>
+
+              </div>
             </div>
-
-            {/* BUTTON */}
-            <div className="projects-more">
-
-                <Link
-                    to="/projects"
-                    className="explore-btn"
-                >
-                    Explore More Projects →
-                </Link>
-
-            </div>
-
-        </section>
-
-    )
+          ))}
+        </div>
+      )}
+    </section>
+  );
 }
 
-export default Projects
+export default Projects;

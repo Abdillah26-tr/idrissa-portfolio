@@ -1,4 +1,7 @@
 from rest_framework import generics
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+
 from .models import (
     Project,
     Skill,
@@ -7,7 +10,7 @@ from .models import (
     Tool,
     Education,
     Experience,
-    ContactMessage   # ✅ ADD THIS
+    ContactMessage
 )
 
 from .serializers import (
@@ -18,7 +21,7 @@ from .serializers import (
     ToolSerializer,
     EducationSerializer,
     ExperienceSerializer,
-    ContactSerializer   # ✅ ADD THIS
+    ContactSerializer
 )
 
 
@@ -79,12 +82,27 @@ class ExperienceListView(generics.ListAPIView):
 
 
 # =========================
-# CONTACT - SEND MESSAGE (KEEP AS IS)
+# STATS VIEW (NEW 🚀)
 # =========================
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
+@api_view(['GET'])
+def stats_view(request):
+
+    data = {
+        "projects": Project.objects.count(),
+        "skills": Skill.objects.count(),
+        "tools": Tool.objects.count(),
+        "certificates": Certificate.objects.count(),
+        "education": Education.objects.count(),
+        "experience": Experience.objects.count(),
+        "messages": ContactMessage.objects.count(),
+    }
+
+    return Response(data)
 
 
+# =========================
+# CONTACT - SEND MESSAGE
+# =========================
 @api_view(['POST'])
 def send_message(request):
 
@@ -105,7 +123,7 @@ def send_message(request):
 
 
 # =========================
-# CONTACT - GET MESSAGES (NEW FIX)
+# CONTACT - GET MESSAGES
 # =========================
 @api_view(['GET'])
 def get_messages(request):

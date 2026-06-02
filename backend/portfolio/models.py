@@ -67,6 +67,7 @@ class Skill(models.Model):
 # =========================
 # ABOUT MODEL
 # =========================
+
 class About(models.Model):
 
     full_name = models.CharField(max_length=200)
@@ -107,8 +108,18 @@ class About(models.Model):
         null=True
     )
 
+    # =========================
+    # NEW FIELD: RESUME / CV
+    # =========================
+    resume = models.FileField(
+        upload_to='resume/',
+        blank=True,
+        null=True
+    )
+
     created_at = models.DateTimeField(auto_now_add=True)
 
+    # FIXED HERE 👇
     def __str__(self):
         return self.full_name
 

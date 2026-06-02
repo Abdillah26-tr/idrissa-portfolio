@@ -7,8 +7,9 @@ function Hero() {
 
     const roles = [
         "Data Scientist",
-        "ML Engineer",
-        "Full Stack Developer"
+        "Machine Learning Engineer",
+        "Data Analyst"
+        
     ]
 
     const [text, setText] = useState("")
@@ -99,7 +100,7 @@ function Hero() {
 
                         <p className="hero-desc">
 
-                            I build scalable web applications and intelligent
+                            I build scalable data analysis system and intelligent
                             machine learning systems that solve real-world
                             problems using modern technologies and clean
                             architecture.
@@ -109,17 +110,36 @@ function Hero() {
                     </div>
 
                     {/* STATIC BUTTONS */}
-                    <div className="hero-buttons">
+                   <div className="hero-buttons">
 
-                        <a href="#" className="btn-cv">
-                            Resume
-                        </a>
+    {/* ================= RESUME DOWNLOAD ================= */}
+    {about?.resume ? (
+        <a
+            href={about.resume}
+            target="_blank"
+            rel="noreferrer"
+            className="btn-cv"
+        >
+            Download Resume
+        </a>
+    ) : (
+        <a
+            href="#about"
+            className="btn-cv"
+        >
+            Resume Not Available
+        </a>
+    )}
 
-                        <a href="#contact" className="btn-contact">
-                            Contact
-                        </a>
+    {/* ================= PROJECT SCROLL ================= */}
+    <a
+        href="#projects"
+        className="btn-contact"
+    >
+        View Projects
+    </a>
 
-                    </div>
+</div>
 
                 </div>
 

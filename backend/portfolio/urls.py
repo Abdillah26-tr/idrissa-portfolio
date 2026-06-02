@@ -8,7 +8,8 @@ from .views import (
     EducationListView,
     ExperienceListView,
     send_message,
-    get_messages   # ✅ ADD THIS
+    get_messages,
+    stats_view   # ✅ ADD THIS
 )
 
 urlpatterns = [
@@ -23,6 +24,11 @@ urlpatterns = [
     path('tools/', ToolListView.as_view()),
     path('education/', EducationListView.as_view()),
     path('experience/', ExperienceListView.as_view()),
+
+    # =========================
+    # STATS API 🚀
+    # =========================
+    path('stats/', stats_view),
 
     # =========================
     # CONTACT API

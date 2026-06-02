@@ -86,6 +86,7 @@ function Contact() {
                         <div>
                             <h4>Phone</h4>
                             <p>+255 655 132 389</p>
+                            <p>+255 622 923 299</p>
                         </div>
                     </div>
 

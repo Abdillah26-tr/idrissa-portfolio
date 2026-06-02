@@ -105,7 +105,7 @@ function About() {
 
                         <div className="about-card">
                             <span className="card-tag">Specialization</span>
-                            <p>AI, ML & Backend Systems</p>
+                            <p>Data Scientist & ML Engineer</p>
                         </div>
 
                         <div className="about-card">

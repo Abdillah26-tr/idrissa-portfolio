@@ -20,8 +20,9 @@ This document shows how to switch the project from SQLite to Postgres on Render 
 4) Release command (runs automatically if present)
 - The repo already contains `render.yaml` with `releaseCommand`:
   ```bash
-  python manage.py migrate --noinput && python manage.py collectstatic --noinput
+  cd backend && python manage.py migrate --noinput && python manage.py collectstatic --noinput
   ```
+- The build/start/release commands must run from the `backend` folder because the Django project and requirements file live there.
 
 5) Local testing with Postgres (optional)
 - Quick with Docker:

@@ -10,6 +10,10 @@ services:
         value: "False"
       - key: USE_WHITENOISE
         value: "True"
-      # Do NOT store secrets here in public repo. Set SECRET_KEY and CLOUDINARY_* in Render dashboard.
+      - key: ALLOWED_HOSTS
+        value: "localhost,127.0.0.1,.onrender.com"
+      # Do NOT store secrets here in public repo. Set SECRET_KEY, DATABASE_URL, and CLOUDINARY_* in Render dashboard.
       # - key: SECRET_KEY
       #   value: "<your-secret-here>"
+      # - key: DATABASE_URL
+      #   value: "postgres://user:pass@host:port/dbname"

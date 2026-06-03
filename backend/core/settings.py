@@ -10,11 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
-from pathlib import Path
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 import os
 from pathlib import Path
 
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -28,10 +27,16 @@ SECRET_KEY = os.environ.get(
 )
 
 # DEBUG should be explicitly set via environment variable. Default is False.
-DEBUG = os.environ.get("DEBUG", "False") == "True"
+DEBUG = os.environ.get("DEBUG", "False").lower() in ("true", "1", "yes")
 
 # Allow hosts via env (comma-separated), with safe defaults for local dev
-ALLOWED_HOSTS = [h.strip() for h in os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1,.onrender.com").split(",") if h.strip()]
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.environ.get(
+        "ALLOWED_HOSTS", "localhost,127.0.0.1,.onrender.com"
+    ).split(",")
+    if host.strip()
+]
 
 
 # Application definition
@@ -57,13 +62,13 @@ INSTALLED_APPS += [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -71,7 +76,7 @@ ROOT_URLCONF = 'core.urls'
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [BASE_DIR / "templates"],  # VERY IMPORTANT
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -86,24 +91,14 @@ TEMPLATES = [
 WSGI_APPLICATION = 'core.wsgi.application'
 
 
-
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-# Database configuration: prefer DATABASE_URL (Postgres on Render), fallback to sqlite.
 DATABASES = {}
 DATABASE_URL = os.environ.get("DATABASE_URL")
 if DATABASE_URL:
-    try:
-        import dj_database_url
-
-        DATABASES["default"] = dj_database_url.parse(DATABASE_URL, conn_max_age=600)
-    except Exception:
-        # If dj_database_url is not installed, fall back to sqlite with a warning.
-        DATABASES["default"] = {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
+    import dj_database_url
+    DATABASES["default"] = dj_database_url.parse(DATABASE_URL, conn_max_age=600)
 else:
     DATABASES = {
         'default': {
@@ -147,10 +142,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
 CORS_ALLOW_ALL_ORIGINS = True
 
-
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 JAZZMIN_SETTINGS = {
     # ================= BRANDING =================
@@ -263,23 +259,14 @@ DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
 
 
 
-ALLOWED_HOSTS = [
-    "localhost",
-    "127.0.0.1",
-    ".onrender.com"
-]
-
-
-
-
-import os
-
-STATIC_URL = "/static/"
-STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
-
 MEDIA_URL = "/media/"
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_ROOT = BASE_DIR / "media"
 
+CSRF_TRUSTED_ORIGINS = [
+    host.strip()
+    for host in os.environ.get("CSRF_TRUSTED_ORIGINS", "").split(",")
+    if host.strip()
+]
 
 # Security settings for production
 if not DEBUG:
@@ -287,12 +274,15 @@ if not DEBUG:
     CSRF_COOKIE_SECURE = True
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
-    SECURE_SSL_REDIRECT = os.environ.get("SECURE_SSL_REDIRECT", "False") == "True"
-    # If behind a proxy/load balancer (Render sets X-Forwarded-Proto)
+    SECURE_SSL_REDIRECT = os.environ.get("SECURE_SSL_REDIRECT", "False").lower() in (
+        "true",
+        "1",
+        "yes",
+    )
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
-# Static files: allow optional whitenoise usage if installed
-if os.environ.get("USE_WHITENOISE", "False") == "True":
+USE_WHITENOISE = os.environ.get("USE_WHITENOISE", "False").lower() in ("true", "1", "yes")
+if USE_WHITENOISE:
     MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
     STATICFILES_STORAGE = os.environ.get(
         "STATICFILES_STORAGE", "whitenoise.storage.CompressedManifestStaticFilesStorage"

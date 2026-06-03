@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: idrissa-portfolio-back
+    env: python
+    buildCommand: pip install -r backend/requirements.txt
+    startCommand: gunicorn core.wsgi:application --chdir backend --bind 0.0.0.0:$PORT
+    releaseCommand: python manage.py migrate --noinput && python manage.py collectstatic --noinput
+    envVars:
+      - key: DEBUG
+        value: "False"
+      - key: USE_WHITENOISE
+        value: "True"
+      # Do NOT store secrets here in public repo. Set SECRET_KEY and CLOUDINARY_* in Render dashboard.
+      # - key: SECRET_KEY
+      #   value: "<your-secret-here>"

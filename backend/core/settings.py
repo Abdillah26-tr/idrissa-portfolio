@@ -11,21 +11,27 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+import os
+from pathlib import Path
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-+!&h80p_ps^w+6-f-z^$$bb)i5*4p$r4r$mzxd_4((!o1$(wmb'
+# SECURITY: read secret key from environment in production
+SECRET_KEY = os.environ.get(
+    "SECRET_KEY",
+    "django-insecure-+!&h80p_ps^w+6-f-z^$$bb)i5*4p$r4r$mzxd_4((!o1$(wmb",
+)
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# DEBUG should be explicitly set via environment variable. Default is False.
+DEBUG = os.environ.get("DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = []
+# Allow hosts via env (comma-separated), with safe defaults for local dev
+ALLOWED_HOSTS = [h.strip() for h in os.environ.get("ALLOWED_HOSTS", "localhost,127.0.0.1,.onrender.com").split(",") if h.strip()]
 
 
 # Application definition
@@ -84,12 +90,27 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# Database configuration: prefer DATABASE_URL (Postgres on Render), fallback to sqlite.
+DATABASES = {}
+DATABASE_URL = os.environ.get("DATABASE_URL")
+if DATABASE_URL:
+    try:
+        import dj_database_url
+
+        DATABASES["default"] = dj_database_url.parse(DATABASE_URL, conn_max_age=600)
+    except Exception:
+        # If dj_database_url is not installed, fall back to sqlite with a warning.
+        DATABASES["default"] = {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
-}
 
 
 # Password validation
@@ -232,9 +253,9 @@ JAZZMIN_UI_TWEAKS = {
 import cloudinary
 
 CLOUDINARY_STORAGE = {
-    "CLOUD_NAME": "dyxnjsbjc",
-    "API_KEY": "833468996564241",
-    "API_SECRET": "Jxo9Kg1DiFJt9Q-VMdvVSIvyTpU",
+    "CLOUD_NAME": os.environ.get("CLOUDINARY_CLOUD_NAME", "dyxnjsbjc"),
+    "API_KEY": os.environ.get("CLOUDINARY_API_KEY", "833468996564241"),
+    "API_SECRET": os.environ.get("CLOUDINARY_API_SECRET", "Jxo9Kg1DiFJt9Q-VMdvVSIvyTpU"),
 }
 
 DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
@@ -258,3 +279,21 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+
+
+# Security settings for production
+if not DEBUG:
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_SSL_REDIRECT = os.environ.get("SECURE_SSL_REDIRECT", "False") == "True"
+    # If behind a proxy/load balancer (Render sets X-Forwarded-Proto)
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+# Static files: allow optional whitenoise usage if installed
+if os.environ.get("USE_WHITENOISE", "False") == "True":
+    MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
+    STATICFILES_STORAGE = os.environ.get(
+        "STATICFILES_STORAGE", "whitenoise.storage.CompressedManifestStaticFilesStorage"
+    )
